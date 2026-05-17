@@ -1,0 +1,63 @@
+name: CI/CD — Tests & Deploy
+
+# Запускается при любом push или pull request в ветки main и dev
+on:
+  push:
+    branches: [main, dev, fix]
+  pull_request:
+    branches: [main, dev]
+
+jobs:
+  # ─── JOB 1: Запуск тестов ─────────────────────────────────────────────────
+  test:
+    name: Run Selenium Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Скачиваем код репозитория
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # 2. Устанавливаем Python
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      # 3. Устанавливаем зависимости
+      - name: Install dependencies
+        run: |
+          pip install selenium pytest
+
+      # 4. Устанавливаем Chrome + ChromeDriver (ubuntu-latest уже содержит Chrome)
+      - name: Install ChromeDriver
+        uses: browser-actions/setup-chrome@v1
+
+      # 5. Запускаем тесты; переменная TEST_URL указывает на файл в воркере
+      - name: Run tests
+        env:
+          TEST_URL: ""   # оставляем пустым → тесты открывают файл напрямую
+        run: |
+          pytest tests/test_form.py -v
+
+  # ─── JOB 2: Деплой на GitHub Pages (только ветка main + тесты прошли) ─────
+  deploy:
+    name: Deploy to GitHub Pages
+    needs: test           # запускается ТОЛЬКО если job test успешен
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+
+    permissions:
+      contents: write     # нужно для публикации в ветку gh-pages
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Публикуем папку с index.html на GitHub Pages
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./        # корень репозитория (там лежит index.html)
+          publish_branch: gh-pages

@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Форма регистрации</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: #f0f4f8;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .card {
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.10);
+      padding: 40px 36px;
+      width: 100%;
+      max-width: 420px;
+    }
+    h1 {
+      font-size: 24px;
+      font-weight: 700;
+      color: #1a202c;
+      margin-bottom: 28px;
+      text-align: center;
+    }
+    label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: #4a5568;
+      margin-bottom: 6px;
+    }
+    input, select {
+      width: 100%;
+      padding: 10px 14px;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 8px;
+      font-size: 15px;
+      color: #1a202c;
+      background: #f7fafc;
+      transition: border-color 0.2s;
+      margin-bottom: 20px;
+    }
+    input:focus, select:focus {
+      outline: none;
+      border-color: #4299e1;
+      background: #fff;
+    }
+    button[type="submit"] {
+      width: 100%;
+      padding: 12px;
+      background: #4299e1;
+      color: #fff;
+      font-size: 16px;
+      font-weight: 600;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.2s;
+      margin-top: 4px;
+    }
+    button[type="submit"]:hover { background: #3182ce; }
+    #message {
+      text-align: center;
+      margin-top: 16px;
+      font-size: 14px;
+      min-height: 22px;
+    }
+    .success { color: #38a169; }
+    .error   { color: #e53e3e; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Регистрация</h1>
+    <form id="reg-form" novalidate>
+      <label for="name">Имя</label>
+      <input id="name" name="name" type="text" placeholder="Иван Иванов" autocomplete="name" />
+
+      <label for="email">Email</label>
+      <input id="email" name="email" type="email" placeholder="ivan@example.com" autocomplete="email" />
+
+      <label for="password">Пароль</label>
+      <input id="password" name="password" type="password" placeholder="Минимум 6 символов" />
+
+      <label for="role">Роль</label>
+      <select id="role" name="role">
+        <option value="">— выберите —</option>
+        <option value="student">Студент</option>
+        <option value="teacher">Преподаватель</option>
+        <option value="admin">Администратор</option>
+      </select>
+
+      <button type="submit" id="submit-btn">Зарегистрироваться</button>
+    </form>
+    <p id="message"></p>
+  </div>
+
+  <script>
+    const form = document.getElementById('reg-form');
+    const msg  = document.getElementById('message');
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      msg.className = '';
+      msg.textContent = '';
+
+      const name     = document.getElementById('name').value.trim();
+      const email    = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+      const role     = document.getElementById('role').value;
+
+      if (!name) {
+        msg.textContent = 'Введите имя';
+        msg.className = 'error';
+        return;
+      }
+      if (!email || !email.includes('@')) {
+        msg.textContent = 'Введите корректный email';
+        msg.className = 'error';
+        return;
+      }
+      if (password.length < 6) {
+        msg.textContent = 'Пароль должен содержать минимум 6 символов';
+        msg.className = 'error';
+        return;
+      }
+      if (!role) {
+        msg.textContent = 'Выберите роль';
+        msg.className = 'error';
+        return;
+      }
+
+      msg.textContent = 'Регистрация прошла успешно!';
+      msg.className = 'success';
+    });
+  </script>
+</body>
+</html>
